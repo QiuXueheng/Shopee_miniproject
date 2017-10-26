@@ -16,3 +16,5 @@
     i). Run 'Prediction' to generate the predicted labels for the test samples in the file 'predict.csv'. The results would be saved in a     file named 'predict_result.csv' in the main directory
 
     ii). In the code, set the variable 'pathselect' as 0 to use pretrained models in the folder 'Pretrained_models', or set as 1 to use       the generated models in the folder 'models'
+
+    iii). The predicted results using the pretrained models haved been uploaded in the main directory, named 'predict_result.csv'. 
