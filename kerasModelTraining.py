@@ -6,6 +6,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers.recurrent import LSTM
+from imblearn.combine import SMOTETomek
 import os
 import time
 
@@ -53,6 +54,11 @@ for tar in range(5):
     X, y = np.concatenate((traindata[:, 7:], np.reshape(traindata[:, 0], (traindata.shape[0], 1))), axis=1), traindata[
                                                                                                              :, tar + 1]
     trainX, testX, trainy, testy = train_test_split(X, y, test_size=0.5, random_state=True)
+
+    # oversampling and undersampling for first two datasets
+    if tar < 2:
+        smote_tomek = SMOTETomek(random_state=True)
+        trainX, trainy = smote_tomek.fit_sample(trainX, trainy)
 
     pca = PCA(n_components=2)
     mms = MinMaxScaler()
