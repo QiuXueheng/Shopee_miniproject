@@ -7,9 +7,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
 from sklearn.externals import joblib
+from imblearn.combine import SMOTETomek
 import os
 import numpy as np
-
 
 traindata = pd.read_csv('traindata.csv', index_col=0)
 traindata = traindata.as_matrix()
@@ -20,10 +20,14 @@ if not os.path.exists(r'.\models'):
 
 for tar in range(5):
     print(tar)
-
     X, y = np.concatenate((traindata[:, 7:], np.reshape(traindata[:, 0], (traindata.shape[0], 1))), axis=1), traindata[
                                                                                                              :, tar + 1]
     trainX, testX, trainy, testy = train_test_split(X, y, test_size=0.5, random_state=True)
+
+    # oversampling and undersampling for first two datasets
+    if tar < 2:
+        smote_tomek = SMOTETomek(random_state=True)
+        trainX, trainy = smote_tomek.fit_sample(trainX, trainy)
 
     pca = PCA(n_components=2)
     mms = MinMaxScaler()
@@ -45,6 +49,8 @@ for tar in range(5):
     param_range_feature = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     param_grid_rf = [{'max_depth': param_range_depth,
                       'max_features': param_range_feature}]
+
+
     class run():
         def __init__(self):
             gs = GridSearchCV(estimator=rf,
@@ -58,8 +64,9 @@ for tar in range(5):
             print(gs.best_params_)
             clf = gs.best_estimator_
             clf.fit(trainX_final, trainy)
-            joblib.dump(clf, r'.\models\rf_%s.pkl' %parpath[tar])
+            joblib.dump(clf, r'.\models\rf_%s.pkl' % parpath[tar])
             print('Test accuracy: %.3f' % clf.score(testX_final, testy))
+
 
     if __name__ == '__main__':
         run()
